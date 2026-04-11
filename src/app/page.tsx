@@ -14,7 +14,7 @@ export default function Home() {
         animate={{ opacity: 1, y: 0 }}
         className="text-center space-y-4"
       >
-        <h1 className="text-6xl font-extralight tracking-tight">Yukti</h1>
+        <h1 className="text-6xl font-bold tracking-[0.15em] text-[#2D3748] uppercase mb-2">Yukti</h1>
         <p className="text-gray-400 font-light max-w-md mx-auto">
           Ensuring linguistic justice through unbiased phonetic auditing.
         </p>
@@ -45,14 +45,13 @@ export default function Home() {
         <AnimatePresence mode="wait">
           {isProcessing && (
             <motion.div
-              key="loading-card"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="bg-white border border-teal-100 p-8 rounded-2xl shadow-xl w-full flex flex-col items-center justify-center space-y-3"
-            >
-              <Loader2 className="w-8 h-8 text-teal-600 animate-spin" />
-              <p className="text-teal-700 font-medium tracking-wide animate-pulse">Auditing nuances...</p>
+                key="loading-card"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="bg-white border border-teal-100 p-8 rounded-2xl shadow-xl w-full flex flex-col items-center justify-center"
+                >
+                  <p className="text-teal-700 font-medium tracking-wide animate-pulse">Auditing nuances...</p>
             </motion.div>
           )}
           {!isProcessing && auditData && auditData.transcript && (
@@ -79,18 +78,42 @@ export default function Home() {
                       <span className="text-xs bg-teal-100 text-teal-800 px-2 py-1 rounded-full border border-teal-200">Score: {Number(auditData.equity_score).toFixed(1)}</span>
                     )}
                   </h3>
-                  {auditData.recommendation ? (
-                    <>
-                      <p className="text-gray-700 mt-2 leading-relaxed">{auditData.recommendation}</p>
-                      {auditData.bias_report && (
-                        <div className="mt-4 text-sm text-gray-600 bg-slate-50 p-3 rounded-lg border border-slate-100">
-                          <p><strong>Detected Accent:</strong> {auditData.bias_report.detected_accent}</p>
-                          <p className="mt-1"><strong>Risk:</strong> <span className="capitalize">{auditData.bias_report.misinterpretation_risk}</span></p>
+                  {/* Smart Rendering: Handle both object and string responses from Gemini */}
+                  {typeof auditData.audit === 'object' && auditData.audit !== null ? (
+                    <div className="mt-4 space-y-3">
+                      {auditData.audit.accent_identified && (
+                        <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                          <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">Identified Accent</p>
+                          <p className="text-sm text-slate-800 mt-1">{auditData.audit.accent_identified}</p>
                         </div>
                       )}
-                    </>
+            
+                      {auditData.audit.features && (
+                        <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                          <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">Phonetic Features</p>
+                          <p className="text-sm text-slate-800 mt-1">{auditData.audit.features}</p>
+                        </div>
+                      )}
+            
+                      {auditData.audit.potential_bias_analysis && (
+                        <div className="bg-red-50 p-3 rounded-lg border border-red-100">
+                          <p className="text-xs font-bold text-red-600 uppercase tracking-wide">Bias Analysis</p>
+                          <p className="text-sm text-red-900 mt-1">{auditData.audit.potential_bias_analysis}</p>
+                        </div>
+                      )}
+            
+                      {/* Fallback to recommendation if the object is structured differently */}
+                      {!auditData.audit.accent_identified && auditData.recommendation && (
+                        <p className="text-gray-700 mt-2 leading-relaxed text-sm">{auditData.recommendation}</p>
+                      )}
+                    </div>
                   ) : (
-                    <p className="text-gray-700 mt-1 leading-relaxed">{auditData.audit}</p>
+                    /* Fallback if the model returns a standard string */
+                    <div className="mt-3">
+                      <p className="text-gray-700 leading-relaxed text-sm">
+                        {typeof auditData.audit === 'string' ? auditData.audit : auditData.recommendation}
+                      </p>
+                    </div>
                   )}
                 </div>
               </div>
