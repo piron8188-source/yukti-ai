@@ -3,9 +3,11 @@
 import { Mic, ShieldCheck, Globe, Loader2, FileText, Activity } from 'lucide-react';
 import { useAudioRecorder } from '@/hooks/useAudioRecorder';
 import { motion, AnimatePresence } from 'framer-motion';
+import { PipelineVisualizer } from '@/components/PipelineVisualizer';
 
 export default function Home() {
-  const { isRecording, startRecording, stopRecording, auditData, isProcessing } = useAudioRecorder();
+  const { isRecording, startRecording, stopRecording, auditData, isProcessing, pipelineStage } = useAudioRecorder();
+  const isComplete = !isProcessing && auditData !== null;
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-[#fdfbf7] text-[#2c3e50] p-6">
@@ -41,7 +43,9 @@ export default function Home() {
         </button>
       </div>
 
-      <div className="min-h-[200px] w-full max-w-2xl mt-8">
+      <div className="w-full max-w-2xl mt-8 flex flex-col items-center gap-6">
+        <PipelineVisualizer isProcessing={isProcessing} isComplete={isComplete} currentStage={pipelineStage} />
+        <div className="w-full">
         <AnimatePresence mode="wait">
           {isProcessing && (
             <motion.div
@@ -253,6 +257,7 @@ export default function Home() {
             </motion.div>
           )}
         </AnimatePresence>
+        </div>
       </div>
 
       <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-12 max-w-2xl">

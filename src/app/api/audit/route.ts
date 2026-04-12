@@ -19,18 +19,37 @@ const fetchWithRetry = async (model: any, requestConfig: any, retries = 3, delay
 };
 
 export async function POST(request: Request) {
-  try {
-    const formData = await request.formData();
-    const file = formData.get('audio') as Blob;
-    const buffer = Buffer.from(await file.arrayBuffer());
-    const base64Audio = buffer.toString('base64');
+  const encoder = new TextEncoder();
 
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY as string);
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-2.5-flash"
-    });
+  const stream = new ReadableStream({
+    async start(controller) {
+      const emit = (payload: unknown) => {
+        controller.enqueue(encoder.encode(`${JSON.stringify(payload)}\n`));
+      };
 
-    const auditPrompt = `You are an AI Linguistic Justice auditor (SDG 10). Analyze this audio for regional accent bias.
+      try {
+        const formData = await request.formData();
+        const file = formData.get('audio') as Blob | null;
+
+        if (!file) {
+          emit({ type: 'error', message: 'Missing audio file' });
+          controller.close();
+          return;
+        }
+
+        const buffer = Buffer.from(await file.arrayBuffer());
+        const base64Audio = buffer.toString('base64');
+
+        emit({ type: 'stage', stage: 1 });
+
+        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY as string);
+        const model = genAI.getGenerativeModel({
+          model: 'gemini-2.5-flash'
+        });
+
+        emit({ type: 'stage', stage: 2 });
+
+        const auditPrompt = `You are an AI Linguistic Justice auditor (SDG 10). Analyze this audio for regional accent bias.
 
   Return ONLY a valid JSON object with exactly these keys:
   - "transcript": the verbatim transcript as a string
@@ -52,33 +71,47 @@ export async function POST(request: Request) {
 
   Return nothing else. No markdown, no explanation.`;
 
-    const requestConfig = {
-      contents: [{
-        role: 'user',
-        parts: [
-          { text: auditPrompt },
-          { inlineData: { data: base64Audio, mimeType: file.type || 'audio/webm' } }
-        ],
-      }],
-      generationConfig: { responseMimeType: 'application/json' }
-    };
+        const requestConfig = {
+          contents: [{
+            role: 'user',
+            parts: [
+              { text: auditPrompt },
+              { inlineData: { data: base64Audio, mimeType: file.type || 'audio/webm' } }
+            ],
+          }],
+          generationConfig: { responseMimeType: 'application/json' }
+        };
 
-    // Use the retry wrapper here
-    const result = await fetchWithRetry(model, requestConfig);
+        emit({ type: 'stage', stage: 3 });
 
-    const response = await result.response;
-    const text = response.text();
+        const result = await fetchWithRetry(model, requestConfig);
+        const response = await result.response;
+        const text = response.text();
 
-    try {
-      const jsonResult = JSON.parse(text);
-      return NextResponse.json(jsonResult);
-    } catch (parseError) {
-      console.error("JSON Parse Error:", text);
-      return NextResponse.json({ transcript: "Parse failed", audit: text }, { status: 200 });
-    }
+        let jsonResult: any;
+        try {
+          jsonResult = JSON.parse(text);
+        } catch (parseError) {
+          console.error('JSON Parse Error:', text, parseError);
+          jsonResult = { transcript: 'Parse failed', audit: text };
+        }
 
-  } catch (error) {
-    console.error('Gemini SDK Error:', error);
-    return NextResponse.json({ error: 'Audit failed due to high demand' }, { status: 500 });
-  }
+        emit({ type: 'stage', stage: 4 });
+        emit({ type: 'result', data: jsonResult });
+      } catch (error) {
+        console.error('Gemini SDK Error:', error);
+        emit({ type: 'error', message: 'Audit failed due to high demand' });
+      } finally {
+        controller.close();
+      }
+    },
+  });
+
+  return new NextResponse(stream, {
+    headers: {
+      'Content-Type': 'application/x-ndjson; charset=utf-8',
+      'Cache-Control': 'no-cache, no-transform',
+      Connection: 'keep-alive',
+    },
+  });
 }
