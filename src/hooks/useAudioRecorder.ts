@@ -34,6 +34,7 @@ export const useAudioRecorder = () => {
   const [repairData, setRepairData] = useState<any>(null);
   const [isGeneratingRepair, setIsGeneratingRepair] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
+  const [micPermissionDenied, setMicPermissionDenied] = useState(false);
   const mediaRecorder = useRef<MediaRecorder | null>(null);
   const chunks = useRef<Blob[]>([]);
 
@@ -42,18 +43,28 @@ export const useAudioRecorder = () => {
     setRepairData(null);
     setPipelineStage(-1);
     setApiError(null);
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    mediaRecorder.current = new MediaRecorder(stream);
-    chunks.current = [];
+    setMicPermissionDenied(false);
 
-    mediaRecorder.current.ondataavailable = (e) => chunks.current.push(e.data);
-    mediaRecorder.current.onstop = async () => {
-      const blob = new Blob(chunks.current, { type: 'audio/webm' });
-      await processAudioBlob(blob, 'audio/webm');
-    };
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorder.current = new MediaRecorder(stream);
+      chunks.current = [];
 
-    mediaRecorder.current.start();
-    setIsRecording(true);
+      mediaRecorder.current.ondataavailable = (e) => chunks.current.push(e.data);
+      mediaRecorder.current.onstop = async () => {
+        const blob = new Blob(chunks.current, { type: 'audio/webm' });
+        await processAudioBlob(blob, 'audio/webm');
+      };
+
+      mediaRecorder.current.start();
+      setIsRecording(true);
+    } catch (err: any) {
+      if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+        setMicPermissionDenied(true);
+      } else {
+        console.error('Microphone access error:', err);
+      }
+    }
   };
 
   const processAudioBlob = async (blob: Blob, processType: string = 'audio/webm') => {
@@ -177,5 +188,5 @@ export const useAudioRecorder = () => {
     }
   };
 
-  return { isRecording, startRecording, stopRecording, auditData, isProcessing, pipelineStage, repairData, isGeneratingRepair, generateContextualRepair, startDemo, apiError, processAudioBlob };
+  return { isRecording, startRecording, stopRecording, auditData, isProcessing, pipelineStage, repairData, isGeneratingRepair, generateContextualRepair, startDemo, apiError, processAudioBlob, micPermissionDenied };
 };
