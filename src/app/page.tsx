@@ -536,94 +536,110 @@ function OfficialPdfReport({ auditData, repairData }: { auditData: any, repairDa
   const score = Number(auditData.equity_score ?? 0);
   const displayNum = Math.round(score * 100);
   const scoreColor = score >= 0.7 ? '#14b8a6' : score >= 0.4 ? '#f59e0b' : '#ef4444';
+  
+  const radius = 32;
+  const circumference = 2 * Math.PI * radius;
+  const strokeDashoffset = circumference - (score * circumference);
 
   return (
     <div id="official-pdf-report" style={{
-      position: 'fixed', left: '-9999px', top: 0,
-      width: 800, padding: 48,
+      position: 'absolute', left: '-9999px', top: 0, zIndex: -100,
+      width: 800, padding: 64,
       background: '#ffffff', color: '#111827',
       fontFamily: 'system-ui, -apple-system, sans-serif'
     }}>
       {/* Header */}
-      <div style={{ borderBottom: '2px solid #e5e7eb', paddingBottom: 24, marginBottom: 32, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <div>
-          <h1 style={{ fontSize: 24, fontWeight: 700, margin: 0, letterSpacing: '-0.02em', color: '#111827' }}>
-            OFFICIAL LINGUISTIC EQUITY REPORT
-          </h1>
-          <div style={{ fontSize: 12, color: '#6b7280', marginTop: 8, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
-            Model: Gemini 2.5 Flash / Vertex AI
+      <div style={{ borderBottom: '1px solid #e5e7eb', paddingBottom: 32, marginBottom: 40, textAlign: 'center' }}>
+        <h1 style={{ fontSize: 28, fontWeight: 400, margin: '0 0 20px 0', letterSpacing: '-0.02em', color: '#111827', fontFamily: 'Georgia, serif' }}>
+          OFFICIAL LINGUISTIC EQUITY REPORT
+        </h1>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 40, fontSize: 10, color: '#4b5563', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <span style={{ color: '#9ca3af' }}>SESSION ID</span>
+            <span style={{ fontWeight: 600 }}>YUK-2651-A</span>
           </div>
-        </div>
-        <div style={{ textAlign: 'right', fontSize: 11, color: '#6b7280', fontFamily: 'monospace' }}>
-          <div>SESSION ID</div>
-          <div style={{ fontWeight: 600, color: '#374151', marginTop: 4 }}>YUK-{Math.floor(1000 + Math.random() * 9000)}-A</div>
-          <div style={{ marginTop: 8 }}>{new Date('2026-04-12').toLocaleDateString()}</div>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <span style={{ color: '#9ca3af' }}>DATE</span>
+            <span style={{ fontWeight: 600 }}>2026</span>
+          </div>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <span style={{ color: '#9ca3af' }}>MODEL</span>
+            <span style={{ fontWeight: 600 }}>GEMINI 2.5 FLASH</span>
+          </div>
         </div>
       </div>
 
       {/* Score */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 24, padding: 24, background: '#f9fafb', borderRadius: 12, border: '1px solid #e5e7eb', marginBottom: 32 }}>
-        <div style={{ width: 80, height: 80, borderRadius: '50%', border: `6px solid ${scoreColor}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <span style={{ fontSize: 28, fontWeight: 700, color: scoreColor }}>{displayNum}</span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 32, padding: '32px 40px', background: '#fafafa', borderRadius: 16, border: '1px solid #f3f4f6', marginBottom: 40 }}>
+        <div style={{ position: 'relative', width: 80, height: 80, flexShrink: 0 }}>
+          <svg width="80" height="80">
+            <circle cx="40" cy="40" r={radius} stroke="#e5e7eb" strokeWidth="6" fill="transparent" />
+            <circle cx="40" cy="40" r={radius} stroke={scoreColor} strokeWidth="6" fill="transparent"
+                    strokeDasharray={circumference} strokeDashoffset={strokeDashoffset} 
+                    transform="rotate(-90 40 40)" 
+                    strokeLinecap="round" />
+            <text x="40" y="40" dominantBaseline="middle" textAnchor="middle" fontSize="20" fill="#111827" fontWeight="bold" fontFamily="monospace">
+              {displayNum}
+            </text>
+          </svg>
         </div>
         <div>
-          <div style={{ fontSize: 16, fontWeight: 600, color: '#374151', marginBottom: 4 }}>
+          <div style={{ fontSize: 18, fontWeight: 600, color: '#111827', marginBottom: 8 }}>
             Systemic Fairness Scorecard
           </div>
-          <div style={{ fontSize: 13, color: '#6b7280' }}>
-            A composite evaluation mapping phonetic accuracy, lexical fairness, and bias resilience.
+          <div style={{ fontSize: 13, color: '#4b5563', lineHeight: 1.6 }}>
+            A composite evaluation mapping phonetic accuracy, lexical fairness, and bias resilience. The gauge reflects the AI system's ability to maintain equity across regional dialects.
           </div>
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 24, marginBottom: 32 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32, marginBottom: 40 }}>
         {/* Identified Dialect */}
-        <div style={{ padding: 20, border: '1px solid #e5e7eb', borderRadius: 8 }}>
-          <div style={{ fontSize: 11, fontWeight: 600, color: '#6b7280', textTransform: 'uppercase', marginBottom: 8 }}>
+        <div style={{ padding: 32, background: '#f8fafc', border: '1px solid #f1f5f9', borderRadius: 16 }}>
+          <div style={{ fontSize: 10, fontWeight: 600, color: '#64748b', textTransform: 'uppercase', marginBottom: 16, letterSpacing: '0.1em' }}>
             Identified Dialect Profile
           </div>
-          <div style={{ fontSize: 14, color: '#111827', lineHeight: 1.5 }}>
+          <div style={{ fontSize: 15, color: '#0f172a', lineHeight: 1.6, fontFamily: 'Georgia, serif' }}>
             {auditData.audit?.accent_identified || 'Standard English mapping'}
           </div>
         </div>
         {/* Bias Risk */}
-        <div style={{ padding: 20, border: '1px solid #e5e7eb', borderRadius: 8, background: '#fef2f2', borderColor: '#fecaca' }}>
-          <div style={{ fontSize: 11, fontWeight: 600, color: '#b91c1c', textTransform: 'uppercase', marginBottom: 8 }}>
+        <div style={{ padding: 32, background: '#fff1f2', border: '1px solid #ffe4e6', borderRadius: 16 }}>
+          <div style={{ fontSize: 10, fontWeight: 600, color: '#e11d48', textTransform: 'uppercase', marginBottom: 16, letterSpacing: '0.1em' }}>
             Phonetic Bias Risk
           </div>
-          <div style={{ fontSize: 13, color: '#991b1b', lineHeight: 1.5 }}>
+          <div style={{ fontSize: 14, color: '#9f1239', lineHeight: 1.6, fontFamily: 'Georgia, serif' }}>
             {auditData.audit?.potential_bias_analysis || auditData.xai_explanation || 'No substantial risk metrics detected.'}
           </div>
         </div>
       </div>
 
-      <div style={{ marginBottom: 32 }}>
-        <div style={{ fontSize: 14, fontWeight: 600, color: '#374151', marginBottom: 12 }}>Equitable Transcript Generation</div>
-        {repairData ? (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-            <div>
-              <div style={{ fontSize: 10, color: '#6b7280', textTransform: 'uppercase', marginBottom: 6 }}>Original Capture</div>
-              <div style={{ padding: 16, background: '#f3f4f6', borderRadius: 6, fontSize: 13, color: '#4b5563', fontStyle: 'italic' }}>
-                &quot;{repairData.original}&quot;
-              </div>
+      {/* Transcripts Table */}
+      <div style={{ marginBottom: 40 }}>
+        <div style={{ fontSize: 15, fontWeight: 600, color: '#111827', marginBottom: 16 }}>Equitable Transcript Comparison</div>
+        <div style={{ border: '1px solid #e5e7eb', borderRadius: 16, overflow: 'hidden' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', background: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
+            <div style={{ padding: '16px 24px', fontSize: 10, fontWeight: 600, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.1em', borderRight: '1px solid #e5e7eb' }}>
+              Original Capture
             </div>
-            <div>
-              <div style={{ fontSize: 10, color: '#14b8a6', textTransform: 'uppercase', marginBottom: 6 }}>Contextual Repair</div>
-              <div style={{ padding: 16, background: '#f0fdfa', border: '1px solid #ccfbf1', borderRadius: 6, fontSize: 13, color: '#115e59' }}>
-                &quot;{repairData.repaired}&quot;
-              </div>
+            <div style={{ padding: '16px 24px', fontSize: 10, fontWeight: 600, color: '#0f766e', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+              Contextual Repair
             </div>
           </div>
-        ) : (
-          <div style={{ padding: 16, background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: 6, fontSize: 14, color: '#111827' }}>
-            &quot;{auditData.transcript}&quot;
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
+            <div style={{ padding: '32px 24px', fontSize: 14, color: '#4b5563', fontFamily: 'Georgia, serif', whiteSpace: 'pre-wrap', borderRight: '1px solid #e5e7eb', lineHeight: 1.8, background: '#ffffff', wordBreak: 'break-word' }}>
+              &quot;{repairData ? repairData.original : auditData.transcript}&quot;
+            </div>
+            <div style={{ padding: '32px 24px', fontSize: 14, color: '#0f766e', fontFamily: 'Georgia, serif', whiteSpace: 'pre-wrap', lineHeight: 1.8, background: '#f0fdfa', wordBreak: 'break-word' }}>
+              &quot;{repairData ? repairData.repaired : 'Pending generation...'}&quot;
+            </div>
           </div>
-        )}
+        </div>
       </div>
 
-      <div style={{ marginTop: 64, paddingTop: 24, borderTop: '1px solid #e5e7eb', textAlign: 'center' }}>
-        <div style={{ fontSize: 11, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-          GENERATED BY YUKTI AI PROMOTING SDG 10.3 LINGUISTIC INCLUSION
+      <div style={{ marginTop: 64, paddingTop: 32, borderTop: '1px solid #f3f4f6', textAlign: 'center' }}>
+        <div style={{ fontSize: 9, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.15em' }}>
+          GENERATED BY YUKTI AI · PROMOTING SDG 10.3 LINGUISTIC INCLUSION
         </div>
       </div>
     </div>
@@ -664,117 +680,40 @@ export default function Home() {
   const handleDownloadPdf = async () => {
     setIsGeneratingPdf(true);
     try {
+      const { default: html2canvas } = await import('html2canvas');
       const { jsPDF } = await import('jspdf');
-      let autoTable: any;
-      try {
-        // @ts-ignore
-        autoTable = (await import('jspdf-autotable')).default;
-      } catch (err) {
-        alert("Please run `npm install jspdf-autotable` to enable the new tabular PDF export!");
-        setIsGeneratingPdf(false);
-        return;
-      }
 
-      const doc = new jsPDF({
+      const element = document.getElementById('official-pdf-report');
+      if (!element) return;
+      
+      const clone = element.cloneNode(true) as HTMLElement;
+      clone.style.position = 'absolute';
+      clone.style.left = '-9999px';
+      clone.style.top = '0px';
+      document.body.appendChild(clone);
+
+      const canvas = await html2canvas(clone, { 
+        scale: 3, 
+        useCORS: true,
+        backgroundColor: '#ffffff',
+        width: element.id === 'official-pdf-report' ? 800 : clone.scrollWidth,
+        height: clone.scrollHeight,
+        windowWidth: element.id === 'official-pdf-report' ? 800 : clone.scrollWidth,
+      });
+      
+      document.body.removeChild(clone);
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({
         orientation: 'portrait',
-        unit: 'pt',
-        format: 'a4'
+        unit: 'px',
+        format: [canvas.width / 3, canvas.height / 3]
       });
-
-      const pageWidth = doc.internal.pageSize.getWidth();
-      const margin = 50;
-      let y = margin + 30;
-
-      // 1. Header Block
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(22);
-      doc.setTextColor(20, 20, 20);
-      doc.text('OFFICIAL LINGUISTIC EQUITY REPORT', margin, y);
-      
-      const score = Math.round(Number(auditData?.equity_score ?? 0) * 100);
-      const circleX = pageWidth - margin - 30;
-      const radius = 30;
-      
-      doc.setDrawColor(20, 184, 166);
-      doc.setLineWidth(5);
-      doc.circle(circleX, y - 8, radius);
-      
-      doc.setTextColor(0, 0, 0);
-      doc.setFontSize(32);
-      doc.text(score.toString(), circleX, y + (radius / 3) - 5, { align: 'center' });
-      
-      y += 60;
-
-      // 2. Horizontal Metadata
-      autoTable(doc, {
-        startY: y,
-        margin: { left: margin, right: margin },
-        head: [['SESSION ID', 'MODEL', 'DATE']],
-        body: [[
-          `YUK-${Math.floor(1000 + Math.random() * 9000)}-A`,
-          'Gemini 2.5 Flash',
-          new Date(2026, 3, 12).toLocaleDateString()
-        ]],
-        theme: 'plain',
-        headStyles: { fillColor: [249, 250, 251], textColor: [100, 100, 100], fontStyle: 'bold', fontSize: 10 },
-        bodyStyles: { textColor: [20, 20, 20], fontStyle: 'bold', fontSize: 11 },
-        styles: { cellPadding: 8, halign: 'center' }
-      });
-
-      y = (doc as any).lastAutoTable.finalY + 30;
-
-      // 3. Dialect Profile Box
-      autoTable(doc, {
-        startY: y,
-        margin: { left: margin, right: margin },
-        head: [['IDENTIFIED DIALECT PROFILE']],
-        body: [[auditData?.audit?.accent_identified || 'Standard English mapping']],
-        theme: 'grid',
-        headStyles: { fillColor: [249, 250, 251], textColor: [100, 100, 100], fontStyle: 'bold' },
-        bodyStyles: { fillColor: [255, 255, 255], textColor: [20, 20, 20] },
-      });
-
-      y = (doc as any).lastAutoTable.finalY + 20;
-
-      // 4. Phonetic Bias Box
-      autoTable(doc, {
-        startY: y,
-        margin: { left: margin, right: margin },
-        head: [['PHONETIC BIAS RISK']],
-        body: [[auditData?.audit?.potential_bias_analysis || 'No substantial risk metrics detected.']],
-        theme: 'grid',
-        headStyles: { fillColor: [254, 242, 242], textColor: [185, 28, 28], fontStyle: 'bold' },
-        bodyStyles: { fillColor: [255, 255, 255], textColor: [153, 27, 27] },
-      });
-
-      y = (doc as any).lastAutoTable.finalY + 40;
-
-      // 5. Comparative Transcript Grids
-      autoTable(doc, {
-        startY: y,
-        margin: { left: margin, right: margin },
-        head: [['ORIGINAL CAPTURE', 'CONTEXTUAL REPAIR']],
-        body: [[
-          repairData ? repairData.original : auditData?.transcript || '',
-          repairData ? repairData.repaired : 'Pending generation...'
-        ]],
-        theme: 'grid',
-        headStyles: { fillColor: [243, 244, 246], textColor: [50, 50, 50], fontStyle: 'bold', halign: 'center' },
-        bodyStyles: { valign: 'top' },
-        columnStyles: {
-          0: { cellWidth: '50%', textColor: [75, 85, 99], fontStyle: 'italic' },
-          1: { cellWidth: '50%', textColor: [15, 118, 110] }
-        }
-      });
-
-      // Footer
-      doc.setTextColor(100, 100, 100);
-      doc.setFontSize(9);
-      doc.text('GENERATED BY YUKTI AI PROMOTING SDG 10.3 LINGUISTIC INCLUSION', pageWidth / 2, doc.internal.pageSize.getHeight() - 40, { align: 'center' });
-
-      doc.save('Linguistic_Justice_Audit_Report.pdf');
+      pdf.addImage(imgData, 'PNG', 0, 0, canvas.width / 3, canvas.height / 3);
+      pdf.save('Linguistic_Justice_Audit_Report.pdf');
     } catch (error) {
       console.error('Error generating PDF:', error);
+      alert('Error generating PDF report.');
     } finally {
       setIsGeneratingPdf(false);
     }
@@ -1233,32 +1172,34 @@ export default function Home() {
                 transition={{ delay: 0.8 }}
                 style={{ marginTop: 48, display: 'flex', alignItems: 'center', gap: 16 }}
               >
-                <button
-                  onClick={generateContextualRepair}
-                  disabled={isGeneratingRepair}
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: 8,
-                    padding: '10px 20px',
-                    background: isGeneratingRepair ? 'rgba(20,184,166,0.05)' : 'rgba(20,184,166,0.08)',
-                    border: '1px solid rgba(20,184,166,0.25)',
-                    borderRadius: 8,
-                    color: 'var(--teal)',
-                    fontFamily: 'var(--font-mono)',
-                    fontSize: 11,
-                    letterSpacing: '0.06em',
-                    cursor: isGeneratingRepair ? 'not-allowed' : 'pointer',
-                    opacity: isGeneratingRepair ? 0.7 : 1,
-                    transition: 'all 0.2s ease',
-                  }}
-                  onMouseEnter={e => {
-                    if (!isGeneratingRepair) e.currentTarget.style.background = 'rgba(20,184,166,0.12)';
-                  }}
-                  onMouseLeave={e => {
-                    if (!isGeneratingRepair) e.currentTarget.style.background = 'rgba(20,184,166,0.08)';
-                  }}
-                >
-                  {isGeneratingRepair ? 'Generating Repair...' : 'Generate Contextual Repair'}
-                </button>
+                {!repairData && (
+                  <button
+                    onClick={generateContextualRepair}
+                    disabled={isGeneratingRepair}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 8,
+                      padding: '10px 20px',
+                      background: isGeneratingRepair ? 'rgba(20,184,166,0.05)' : 'rgba(20,184,166,0.08)',
+                      border: '1px solid rgba(20,184,166,0.25)',
+                      borderRadius: 8,
+                      color: 'var(--teal)',
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: 11,
+                      letterSpacing: '0.06em',
+                      cursor: isGeneratingRepair ? 'not-allowed' : 'pointer',
+                      opacity: isGeneratingRepair ? 0.7 : 1,
+                      transition: 'all 0.2s ease',
+                    }}
+                    onMouseEnter={e => {
+                      if (!isGeneratingRepair) e.currentTarget.style.background = 'rgba(20,184,166,0.12)';
+                    }}
+                    onMouseLeave={e => {
+                      if (!isGeneratingRepair) e.currentTarget.style.background = 'rgba(20,184,166,0.08)';
+                    }}
+                  >
+                    {isGeneratingRepair ? 'Generating Repair...' : 'Generate Contextual Repair'}
+                  </button>
+                )}
                 <button
                   onClick={() => { resetAudit(); }}
                   style={{

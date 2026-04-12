@@ -108,56 +108,90 @@ export const useAudioRecorder = () => {
     const ext = processType.includes('mp3') ? 'mp3' : processType.includes('wav') ? 'wav' : 'webm';
     formData.append('audio', blob, `audio.${ext}`);
 
-    try {
-      const response = await fetch('/api/audit', {
-        method: 'POST',
-        body: formData,
-      });
+    let finalResultData: any = null;
+    let finalError: string | null = null;
+    let isApiDone = false;
 
-      if (!response.ok || !response.body) {
-        const errorResult = await response.json().catch(() => ({}));
-        console.error('Backend returned an error. Wait aborted:', errorResult);
-        setApiError('Failed to process audio. API quota may be exceeded.');
-        return;
-      }
+    // Run backend fetch independently
+    const fetchTask = (async () => {
+      try {
+        const response = await fetch('/api/audit', {
+          method: 'POST',
+          body: formData,
+        });
 
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let bufferText = '';
+        if (!response.ok || !response.body) {
+          const errorResult = await response.json().catch(() => ({}));
+          console.error('Backend returned an error. Wait aborted:', errorResult);
+          finalError = 'Failed to process audio. API quota may be exceeded.';
+          isApiDone = true;
+          return;
+        }
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let bufferText = '';
 
-        bufferText += decoder.decode(value, { stream: true });
-        const lines = bufferText.split('\n');
-        bufferText = lines.pop() ?? '';
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
 
-        for (const line of lines) {
-          if (!line.trim()) continue;
-          try {
-            const payload = JSON.parse(line);
+          bufferText += decoder.decode(value, { stream: true });
+          const lines = bufferText.split('\n');
+          bufferText = lines.pop() ?? '';
 
-            if (payload.type === 'stage' && typeof payload.stage === 'number') {
-              setPipelineStage(payload.stage);
+          for (const line of lines) {
+            if (!line.trim()) continue;
+            try {
+              const payload = JSON.parse(line);
+              if (payload.type === 'result' && payload.data) {
+                finalResultData = payload.data;
+              }
+              if (payload.type === 'error') {
+                console.error('Audit pipeline error:', payload.message);
+                finalError = payload.message || 'Audit pipeline error';
+              }
+            } catch (parseError) {
+              console.warn('Skipping non-JSON pipeline line:', line, parseError);
             }
-
-            if (payload.type === 'result' && payload.data) {
-              setAuditData(payload.data);
-            }
-
-            if (payload.type === 'error') {
-              console.error('Audit pipeline error:', payload.message);
-              setApiError(payload.message || 'Audit pipeline error');
-            }
-          } catch (parseError) {
-            console.warn('Skipping non-JSON pipeline line:', line, parseError);
           }
         }
+      } catch (error) {
+        console.error("Error sending audio to audit:", error);
+        finalError = 'Network error. Please try again.';
+      } finally {
+        isApiDone = true;
       }
-    } catch (error) {
-      console.error("Error sending audio to audit:", error);
-      setApiError('Network error. Please try again.');
+    })();
+
+    // UX Staggered Progress logic
+    try {
+      setPipelineStage(0); // Audio Capture
+      await new Promise(resolve => setTimeout(resolve, 1500));
+
+      setPipelineStage(1); // Chip 3 Base
+      await new Promise(resolve => setTimeout(resolve, 1500));
+
+      setPipelineStage(2); // Phonetic Layer
+      await new Promise(resolve => setTimeout(resolve, 1500));
+
+      setPipelineStage(3); // Gemini API
+      
+      // Wait for actual API processing to finish if it hasn't already
+      while (!isApiDone) {
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+
+      if (!finalError) {
+        setPipelineStage(4); // Equity Score
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+
+      if (finalError) {
+        setApiError(finalError);
+      } else if (finalResultData) {
+        setAuditData(finalResultData);
+      }
     } finally {
       setIsProcessing(false);
     }
