@@ -35,6 +35,27 @@ body {
   font-family: var(--font-geist-sans), sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  padding: 0;
+  margin: 0;
+}
+
+/* Responsive breakpoints */
+@media (max-width: 1024px) {
+  :root {
+    --spacing-base: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --spacing-base: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --spacing-base: 8px;
+  }
 }
 
 /* Subtle grid background */
@@ -43,6 +64,25 @@ body {
     linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
     linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
   background-size: 40px 40px;
+}
+
+/* Responsive container */
+.responsive-container {
+  width: 100%;
+  padding: clamp(12px, 5vw, 32px);
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .responsive-container {
+    padding: clamp(8px, 4vw, 24px);
+  }
+}
+
+@media (max-width: 480px) {
+  .responsive-container {
+    padding: clamp(6px, 3vw, 16px);
+  }
 }
 
 /* Score ring animation */
@@ -91,7 +131,26 @@ body {
   animation: blink 1s step-end infinite;
 }
 
+/* Responsive utilities */
+.hide-mobile {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .hide-mobile {
+    display: flex;
+  }
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 2px; }
+
+@media (max-width: 768px) {
+  ::-webkit-scrollbar { width: 3px; }
+}
+
+@media (max-width: 480px) {
+  ::-webkit-scrollbar { width: 2px; }
+}

@@ -106,7 +106,7 @@ function PipelineVisualizer({
       exit={{ opacity: 0, y: -10 }}
       style={{
         width: '100%',
-        maxWidth: 720,
+        maxWidth: 'clamp(300px, 90vw, 720px)',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -114,20 +114,20 @@ function PipelineVisualizer({
       }}
     >
       {/* Title block — Image 5 style */}
-      <div style={{ textAlign: 'center', marginBottom: 48 }}>
+      <div style={{ textAlign: 'center', marginBottom: 'clamp(24px, 5vw, 48px)' }}>
         <h2 style={{
           fontFamily: 'var(--font-serif)',
-          fontSize: 32,
+          fontSize: 'clamp(24px, 5vw, 32px)',
           fontWeight: 500,
           color: 'var(--text-primary)',
           letterSpacing: '-0.01em',
-          marginBottom: 8,
+          marginBottom: 'clamp(4px, 1vw, 8px)',
         }}>
           {isComplete ? 'Pipeline Analysis Complete' : 'Analyzing Audio Pipeline'}
         </h2>
         <p style={{
           fontFamily: 'var(--font-mono)',
-          fontSize: 12,
+          fontSize: 'clamp(10px, 2vw, 12px)',
           color: 'var(--text-secondary)',
           letterSpacing: '0.05em',
         }}>
@@ -137,17 +137,23 @@ function PipelineVisualizer({
         </p>
       </div>
 
-      {/* Stage nodes — Image 3 style */}
-      <div style={{ position: 'relative', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 8px' }}>
-        {/* Connector lines */}
-        <div style={{ position: 'absolute', left: 60, right: 60, top: '50%', transform: 'translateY(-50%)', height: 1, background: 'rgba(255,255,255,0.06)', zIndex: 0 }} />
+      {/* Stage nodes — responsive grid to avoid mobile overflow */}
+      <div
+        style={{
+          width: '100%',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(96px, 1fr))',
+          gap: 'clamp(8px, 2vw, 12px)',
+          padding: '0 8px',
+        }}
+      >
 
         {PIPELINE_STAGES.map((stage, i) => {
           const isActive = activeStage === stage.id;
           const isDone = completedStages.includes(stage.id);
 
           return (
-            <div key={stage.id} style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+            <div key={stage.id} style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'clamp(6px, 1.5vw, 10px)' }}>
               {/* Active dot above node — Image 5 */}
               <div style={{ height: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 {isActive && (
@@ -164,8 +170,9 @@ function PipelineVisualizer({
                 animate={{ scale: isActive ? 1.04 : 1 }}
                 transition={{ duration: 0.3 }}
                 style={{
-                  width: 112,
-                  padding: '14px 12px',
+                  width: '100%',
+                  minHeight: 'clamp(74px, 16vw, 92px)',
+                  padding: 'clamp(10px, 2vw, 14px) clamp(8px, 1.8vw, 12px)',
                   borderRadius: 10,
                   border: `1px solid ${isActive ? 'var(--teal)' : isDone ? 'rgba(20,184,166,0.25)' : 'rgba(0,0,0,0.12)'}`,
                   background: isActive
@@ -183,14 +190,14 @@ function PipelineVisualizer({
                 }}
               >
                 <span style={{
-                  fontSize: 18,
+                  fontSize: 'clamp(14px, 3vw, 18px)',
                   color: isActive ? 'var(--teal)' : isDone ? 'rgba(20,184,166,0.7)' : 'var(--text-secondary)',
                   transition: 'color 0.3s ease',
                 }}>
                   {isDone ? '✓' : stage.icon}
                 </span>
                 <span style={{
-                  fontSize: 11,
+                  fontSize: 'clamp(9px, 2vw, 11px)',
                   fontWeight: 600,
                   color: isActive ? 'var(--text-primary)' : isDone ? 'var(--text-primary)' : 'var(--text-secondary)',
                   textAlign: 'center',
@@ -204,7 +211,7 @@ function PipelineVisualizer({
 
               {/* Sub label */}
               <span style={{
-                fontSize: 9,
+                fontSize: 'clamp(7px, 1.6vw, 9px)',
                 fontFamily: 'var(--font-mono)',
                 color: isActive ? 'var(--teal)' : isDone ? 'var(--text-secondary)' : 'var(--text-muted)',
                 letterSpacing: '0.04em',
@@ -219,7 +226,7 @@ function PipelineVisualizer({
       </div>
 
       {/* Progress bar — Image 3 */}
-      <div style={{ width: '100%', marginTop: 32, padding: '0 8px' }}>
+      <div style={{ width: '100%', marginTop: 'clamp(16px, 4vw, 32px)', padding: '0 8px' }}>
         <div style={{ height: 2, background: 'rgba(255,255,255,0.06)', borderRadius: 1, overflow: 'hidden' }}>
           <motion.div
             style={{ height: '100%', background: 'var(--teal)', borderRadius: 1 }}
@@ -236,13 +243,13 @@ function PipelineVisualizer({
           animate={{ opacity: 1, y: 0 }}
           style={{
             width: '100%',
-            marginTop: 24,
+            marginTop: 'clamp(14px, 3vw, 24px)',
             background: '#0d0d0d',
             border: '1px solid rgba(255,255,255,0.07)',
             borderRadius: 8,
-            padding: '16px 20px',
+            padding: 'clamp(12px, 2.5vw, 16px) clamp(10px, 2.5vw, 20px)',
             fontFamily: 'var(--font-mono)',
-            fontSize: 11,
+            fontSize: 'clamp(9px, 1.8vw, 11px)',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, paddingBottom: 12, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
@@ -260,7 +267,11 @@ function PipelineVisualizer({
                 initial={{ opacity: 0, x: -6 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.12 }}
-                style={{ color: line.includes('Bypassed') ? 'var(--teal)' : line.includes('Equity Override') ? 'var(--amber)' : 'rgba(255,255,255,0.45)', lineHeight: 1.6 }}
+                style={{
+                  color: line.includes('Bypassed') ? 'var(--teal)' : line.includes('Equity Override') ? 'var(--amber)' : 'rgba(255,255,255,0.45)',
+                  lineHeight: 1.6,
+                  overflowWrap: 'anywhere',
+                }}
               >
                 {line}
               </motion.div>
@@ -321,24 +332,24 @@ function EquityReport({ auditData }: { auditData: any }) {
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
-      style={{ width: '100%', maxWidth: 860 }}
+      style={{ width: '100%', maxWidth: 'clamp(280px, 90vw, 860px)' }}
     >
       {/* Report header — Image 1 */}
-      <div style={{ marginBottom: 32, paddingBottom: 24, borderBottom: '1px solid var(--border)' }}>
-        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start', justifyContent: 'space-between', gap: 24 }}>
+      <div style={{ marginBottom: 'clamp(16px, 4vw, 32px)', paddingBottom: 'clamp(12px, 3vw, 24px)', borderBottom: '1px solid var(--border)' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start', justifyContent: 'space-between', gap: 'clamp(12px, 3vw, 24px)' }}>
           <div style={{ flex: '1 1 min-content' }}>
             <h2 style={{
               fontFamily: 'var(--font-serif)',
-              fontSize: 'clamp(32px, 8vw, 42px)',
+              fontSize: 'clamp(28px, 6vw, 42px)',
               fontWeight: 400,
               color: 'var(--text-primary)',
               letterSpacing: '-0.02em',
               lineHeight: 1,
-              marginBottom: 12,
+              marginBottom: 'clamp(8px, 2vw, 12px)',
             }}>
               Equity Report
             </h2>
-            <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', columnGap: 12, rowGap: 8, fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--text-secondary)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', columnGap: 'clamp(8px, 2vw, 12px)', rowGap: 'clamp(4px, 1vw, 8px)', fontFamily: 'var(--font-mono)', fontSize: 'clamp(7px, 1.5vw, 10px)', color: 'var(--text-secondary)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
               <span style={{ whiteSpace: 'nowrap' }}>Audio recorded</span>
               <span style={{ color: 'var(--border)' }}>·</span>
               <span style={{ whiteSpace: 'nowrap' }}>Dialect: {auditData.audit?.accent_identified?.split('/')[0]?.trim() || 'Regional English'}</span>
@@ -348,7 +359,7 @@ function EquityReport({ auditData }: { auditData: any }) {
           </div>
           <div style={{
             fontFamily: 'var(--font-mono)',
-            fontSize: 10,
+            fontSize: 'clamp(7px, 1.5vw, 10px)',
             color: 'var(--text-secondary)',
             textAlign: 'left',
             letterSpacing: '0.05em',
@@ -362,10 +373,10 @@ function EquityReport({ auditData }: { auditData: any }) {
 
       {/* Equity Header */}
       {/* Yukti Result Panel */}
-      <div style={{ marginBottom: 24 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-          <span style={{ fontSize: 14, color: 'var(--teal)' }}>✦</span>
-          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--teal)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+      <div style={{ marginBottom: 'clamp(12px, 3vw, 24px)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(4px, 1vw, 8px)', marginBottom: 'clamp(8px, 2vw, 12px)' }}>
+          <span style={{ fontSize: 'clamp(10px, 2vw, 14px)', color: 'var(--teal)' }}>✦</span>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'clamp(7px, 1.5vw, 10px)', color: 'var(--teal)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
             Phonetic Integrity Verified
           </span>
         </div>
@@ -373,36 +384,36 @@ function EquityReport({ auditData }: { auditData: any }) {
           background: 'rgba(20,184,166,0.05)',
           border: '1px solid rgba(20,184,166,0.2)',
           borderRadius: 12,
-          padding: 20,
-          marginBottom: 16,
+          padding: 'clamp(12px, 3vw, 20px)',
+          marginBottom: 'clamp(12px, 3vw, 16px)',
           display: 'flex',
           flexWrap: 'wrap',
-          gap: 16,
+          gap: 'clamp(12px, 3vw, 16px)',
           alignItems: 'center',
           justifyContent: 'space-between',
         }}>
           <div>
-            <div style={{ fontFamily: 'var(--font-serif)', fontSize: 14, color: 'var(--text-secondary)', fontStyle: 'italic', marginBottom: 4 }}>
+            <div style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(12px, 2.5vw, 14px)', color: 'var(--text-secondary)', fontStyle: 'italic', marginBottom: 'clamp(2px, 0.5vw, 4px)' }}>
               Adjusted Equity Score
             </div>
-            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--teal)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'clamp(7px, 1.5vw, 10px)', color: 'var(--teal)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
               Phonetic Integrity Preserved
             </div>
           </div>
-          <ScoreRing score={score} size={72} />
+          <ScoreRing score={score} size={64} />
         </div>
 
-        <div style={{ marginBottom: 12 }}>
-          <div style={{ fontFamily: 'var(--font-serif)', fontSize: 15, color: 'var(--text-secondary)', marginBottom: 10 }}>
+        <div style={{ marginBottom: 'clamp(8px, 2vw, 12px)' }}>
+          <div style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(13px, 2.5vw, 15px)', color: 'var(--text-secondary)', marginBottom: 'clamp(6px, 1.5vw, 10px)' }}>
             Equitable Transcript
           </div>
           <div style={{
             background: 'rgba(20,184,166,0.08)',
             border: '1px solid rgba(20,184,166,0.18)',
             borderRadius: 8,
-            padding: '14px 16px',
+            padding: 'clamp(10px, 2vw, 14px) clamp(10px, 2vw, 16px)',
             fontFamily: 'var(--font-mono)',
-            fontSize: 12,
+            fontSize: 'clamp(11px, 2vw, 12px)',
             color: 'var(--text-primary)',
             lineHeight: 1.7,
           }}>
@@ -412,11 +423,11 @@ function EquityReport({ auditData }: { auditData: any }) {
 
         {/* Word risk heatmap */}
         {auditData.word_risks?.length > 0 && (
-          <div style={{ marginBottom: 12 }}>
-            <div style={{ fontFamily: 'var(--font-serif)', fontSize: 15, color: 'rgba(255,255,255,0.4)', marginBottom: 10 }}>
+          <div style={{ marginBottom: 'clamp(8px, 2vw, 12px)' }}>
+            <div style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(13px, 2.5vw, 15px)', color: 'rgba(255,255,255,0.4)', marginBottom: 'clamp(6px, 1.5vw, 10px)' }}>
               Bias Heatmap
             </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'clamp(4px, 1vw, 6px)' }}>
               {auditData.word_risks.map((item: any, i: number) => {
                 const risk = item.risk;
                 const bg = risk >= 0.65
@@ -439,13 +450,13 @@ function EquityReport({ auditData }: { auditData: any }) {
                     key={i}
                     title={`Risk: ${(risk * 100).toFixed(0)}%`}
                     style={{
-                      padding: '3px 8px',
+                      padding: 'clamp(2px, 0.5vw, 3px) clamp(4px, 1vw, 8px)',
                       borderRadius: 4,
                       background: bg,
                       border: `1px solid ${border}`,
                       color,
                       fontFamily: 'var(--font-mono)',
-                      fontSize: 11,
+                      fontSize: 'clamp(9px, 1.5vw, 11px)',
                       cursor: 'default',
                       transition: 'transform 0.15s ease',
                     }}
@@ -460,7 +471,7 @@ function EquityReport({ auditData }: { auditData: any }) {
 
         {/* XAI explanation */}
         {auditData.xai_explanation && (
-          <p style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.7 }}>
+          <p style={{ fontSize: 'clamp(11px, 2vw, 12px)', color: 'var(--text-secondary)', lineHeight: 1.7 }}>
             {auditData.xai_explanation}
           </p>
         )}
@@ -468,7 +479,7 @@ function EquityReport({ auditData }: { auditData: any }) {
 
       {/* Scorecard breakdown — Image 1 bottom section */}
       {auditData.scorecard && (
-        <div style={{ borderTop: '1px solid var(--border)', paddingTop: 24, display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
+        <div className="scorecard-grid" style={{ borderTop: '1px solid var(--border)', paddingTop: 'clamp(16px, 4vw, 24px)', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(clamp(120px, 20vw, 180px), 1fr))', gap: 'clamp(12px, 3vw, 16px)' }}>
           {[
             { label: 'Phonetic Accuracy', key: 'phonetic_accuracy', invert: false },
             { label: 'Lexical Fairness', key: 'lexical_fairness', invert: false },
@@ -481,10 +492,10 @@ function EquityReport({ auditData }: { auditData: any }) {
             const color = pct >= 70 ? 'var(--teal)' : pct >= 40 ? 'var(--amber)' : 'var(--red)';
             return (
               <div key={key}>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--text-secondary)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 8 }}>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'clamp(7px, 1.5vw, 9px)', color: 'var(--text-secondary)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 'clamp(4px, 1vw, 8px)' }}>
                   {label}
                 </div>
-                <div style={{ fontSize: 28, fontWeight: 700, fontFamily: 'var(--font-mono)', color, marginBottom: 6 }}>
+                <div style={{ fontSize: 'clamp(20px, 5vw, 28px)', fontWeight: 700, fontFamily: 'var(--font-mono)', color, marginBottom: 'clamp(4px, 1vw, 6px)' }}>
                   {pct}
                 </div>
                 <div style={{ height: 2, background: 'rgba(255,255,255,0.06)', borderRadius: 1, overflow: 'hidden' }}>
@@ -503,23 +514,23 @@ function EquityReport({ auditData }: { auditData: any }) {
 
       {/* Accent + features */}
       {typeof auditData.audit === 'object' && auditData.audit !== null && (
-        <div style={{ marginTop: 24, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+        <div style={{ marginTop: 'clamp(16px, 4vw, 24px)', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(clamp(150px, 40vw, 300px), 1fr))', gap: 'clamp(12px, 3vw, 16px)' }}>
           {auditData.audit.accent_identified && (
-            <div style={{ padding: '16px 20px', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border)', borderRadius: 10 }}>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--text-secondary)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8 }}>
+            <div style={{ padding: 'clamp(12px, 3vw, 16px) clamp(12px, 3vw, 20px)', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border)', borderRadius: 10 }}>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'clamp(7px, 1.5vw, 9px)', color: 'var(--text-secondary)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 'clamp(4px, 1vw, 8px)' }}>
                 Identified Dialect
               </div>
-              <div style={{ fontSize: 14, color: 'var(--text-primary)', lineHeight: 1.5 }}>
+              <div style={{ fontSize: 'clamp(12px, 2.5vw, 14px)', color: 'var(--text-primary)', lineHeight: 1.5 }}>
                 {auditData.audit.accent_identified}
               </div>
             </div>
           )}
           {auditData.audit.potential_bias_analysis && (
-            <div style={{ padding: '16px 20px', background: 'rgba(220,38,38,0.10)', border: '1px solid rgba(220,38,38,0.22)', borderRadius: 10 }}>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--red)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8 }}>
+            <div style={{ padding: 'clamp(12px, 3vw, 16px) clamp(12px, 3vw, 20px)', background: 'rgba(220,38,38,0.10)', border: '1px solid rgba(220,38,38,0.22)', borderRadius: 10 }}>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'clamp(7px, 1.5vw, 9px)', color: 'var(--red)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 'clamp(4px, 1vw, 8px)' }}>
                 Bias Analysis
               </div>
-              <div style={{ fontSize: 13, color: '#7f1d1d', lineHeight: 1.6 }}>
+              <div style={{ fontSize: 'clamp(11px, 2.5vw, 13px)', color: '#7f1d1d', lineHeight: 1.6 }}>
                 {auditData.audit.potential_bias_analysis}
               </div>
             </div>
@@ -764,34 +775,36 @@ export default function Home() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '16px 32px',
+        padding: 'clamp(12px, 3vw, 16px) clamp(16px, 5vw, 32px)',
         borderBottom: '1px solid var(--border)',
         background: 'rgba(255,255,255,0.95)',
         backdropFilter: 'blur(12px)',
         position: 'sticky',
         top: 0,
         zIndex: 50,
+        flexWrap: 'wrap',
+        gap: 'clamp(8px, 2vw, 16px)',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 13, letterSpacing: '0.2em', color: 'var(--text-primary)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(8px, 2vw, 16px)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(4px, 1vw, 8px)' }}>
+            <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 'clamp(11px, 2.5vw, 13px)', letterSpacing: '0.2em', color: 'var(--text-primary)' }}>
               YUKTI
             </span>
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--text-secondary)', letterSpacing: '0.05em' }}>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'clamp(7px, 1.5vw, 9px)', color: 'var(--text-secondary)', letterSpacing: '0.05em' }}>
               Pipeline
             </span>
           </div>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
-          {/* GCP badge */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(12px, 3vw, 24px)' }}>
+          {/* GCP badge - hide on mobile */}
+          <div className="hide-mobile" style={{ alignItems: 'center', gap: 6 }}>
             <div style={{ display: 'flex', gap: 3 }}>
               {['#4285F4', '#EA4335', '#FBBC05', '#34A853'].map((c, i) => (
-                <div key={i} style={{ width: 5, height: 5, borderRadius: '50%', background: c }} />
+                <div key={i} style={{ width: 4, height: 4, borderRadius: '50%', background: c }} />
               ))}
             </div>
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--text-secondary)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'clamp(7px, 1.5vw, 9px)', color: 'var(--text-secondary)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
               Google Cloud
             </span>
           </div>
@@ -843,23 +856,22 @@ export default function Home() {
                 background: 'rgba(255,255,255,0.95)',
                 border: '1px solid var(--teal)',
                 borderRadius: 16,
-                padding: 32,
-                width: 400,
-                maxWidth: '90vw',
+                padding: 'clamp(20px, 5vw, 32px)',
+                width: 'clamp(280px, 90vw, 400px)',
                 boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
                 backdropFilter: 'blur(10px)',
                 textAlign: 'center',
               }}
             >
-              <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'center' }}>
-                <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'rgba(20,184,166,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Mic size={24} style={{ color: 'var(--teal)' }} />
+              <div style={{ marginBottom: 'clamp(12px, 3vw, 16px)', display: 'flex', justifyContent: 'center' }}>
+                <div style={{ width: 'clamp(40px, 10vw, 48px)', height: 'clamp(40px, 10vw, 48px)', borderRadius: '50%', background: 'rgba(20,184,166,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Mic size={20} style={{ color: 'var(--teal)' }} />
                 </div>
               </div>
-              <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: 20, color: 'var(--text-primary)', marginBottom: 12 }}>
+              <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(16px, 4vw, 20px)', color: 'var(--text-primary)', marginBottom: 'clamp(8px, 2vw, 12px)' }}>
                 Microphone Access Required
               </h3>
-              <p style={{ fontFamily: 'var(--font-mono)', fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: 0 }}>
+              <p style={{ fontFamily: 'var(--font-mono)', fontSize: 'clamp(11px, 2.5vw, 13px)', color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: 0 }}>
                 Microphone is blocked. Please reset permissions in your browser address bar to use live auditing, or use the Upload Audio option below.
               </p>
             </motion.div>
@@ -868,7 +880,7 @@ export default function Home() {
       </AnimatePresence>
 
       {/* ── Main content ── */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '25px 32px 64px 32px' }}>
+      <div style={{ flex: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 'clamp(16px, 5vw, 25px) clamp(16px, 5vw, 32px) clamp(16px, 3vw, 32px)' }}>
 
         {/* Hero — idle state */}
         <AnimatePresence>
@@ -885,18 +897,18 @@ export default function Home() {
               </div>
               <h1 style={{
                 fontFamily: 'var(--font-serif)',
-                fontSize: 'clamp(52px, 8vw, 88px)',
+                fontSize: 'clamp(40px, 10vw, 88px)',
                 fontWeight: 400,
                 color: 'var(--text-primary)',
                 letterSpacing: '-0.03em',
                 lineHeight: 1,
-                marginBottom: 20,
+                marginBottom: 'clamp(12px, 3vw, 20px)',
               }}>
                 Yukti
               </h1>
               <p style={{
                 fontFamily: 'var(--font-geist-sans)',
-                fontSize: 15,
+                fontSize: 'clamp(13px, 2.5vw, 15px)',
                 color: 'var(--text-secondary)',
                 maxWidth: 400,
                 margin: '0 auto',
@@ -929,8 +941,8 @@ export default function Home() {
                     transition={{ duration: 2, repeat: Infinity, delay: i * 0.4, ease: 'easeOut' }}
                     style={{
                       position: 'absolute',
-                      width: 88,
-                      height: 88,
+                      width: 'clamp(48px, 10vw, 88px)',
+                      height: 'clamp(48px, 10vw, 88px)',
                       borderRadius: '50%',
                       border: '1px solid var(--teal)',
                     }}
@@ -942,8 +954,8 @@ export default function Home() {
                   whileTap={{ scale: 0.95 }}
                   onClick={isRecording ? stopRecording : startRecording}
                   style={{
-                    width: 88,
-                    height: 88,
+                    width: 'clamp(64px, 15vw, 88px)',
+                    height: 'clamp(64px, 15vw, 88px)',
                     borderRadius: '50%',
                     background: isRecording ? 'rgba(20,184,166,0.12)' : 'rgba(0,0,0,0.04)',
                     border: `1.5px solid ${isRecording ? 'var(--teal)' : 'rgba(0,0,0,0.15)'}`,
@@ -957,22 +969,22 @@ export default function Home() {
                     zIndex: 1,
                   }}
                 >
-                  <Mic size={28} style={{ color: isRecording ? 'var(--teal)' : 'rgba(0,0,0,0.35)' }} />
+                  <Mic size={24} style={{ color: isRecording ? 'var(--teal)' : 'rgba(0,0,0,0.35)' }} />
                 </motion.button>
               </div>
 
               <div style={{ textAlign: 'center' }}>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: isRecording ? 'var(--teal)' : 'var(--text-secondary)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 4 }}>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'clamp(9px, 2vw, 11px)', color: isRecording ? 'var(--teal)' : 'var(--text-secondary)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 'clamp(2px, 0.5vw, 4px)' }}>
                   {isRecording ? '◉ Recording — Click to stop' : '○ Click to begin audit'}
                 </div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--text-secondary)', letterSpacing: '0.06em' }}>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'clamp(8px, 1.5vw, 10px)', color: 'var(--text-secondary)', letterSpacing: '0.06em' }}>
                   Speak naturally in your regional dialect
                 </div>
               </div>
 
               {!isRecording && (
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, marginTop: 12 }}>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 14, fontWeight: 'bold', padding: '16px 0', color: 'var(--text-secondary)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'clamp(8px, 2vw, 12px)', marginTop: 'clamp(8px, 2vw, 12px)' }}>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'clamp(12px, 2.5vw, 14px)', fontWeight: 'bold', padding: 'clamp(12px, 3vw, 16px) 0', color: 'var(--text-secondary)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
                     — OR —
                   </div>
                   <input
@@ -987,14 +999,14 @@ export default function Home() {
                     style={{
                       display: 'flex',
                       alignItems: 'center',
-                      gap: 8,
-                      padding: '8px 16px',
+                      gap: 'clamp(4px, 1vw, 8px)',
+                      padding: 'clamp(6px, 1.5vw, 8px) clamp(10px, 2vw, 16px)',
                       background: 'rgba(0,0,0,0.03)',
                       border: '1px solid rgba(0,0,0,0.08)',
                       borderRadius: 6,
                       color: 'var(--text-secondary)',
                       fontFamily: 'var(--font-mono)',
-                      fontSize: 10,
+                      fontSize: 'clamp(8px, 1.5vw, 10px)',
                       letterSpacing: '0.04em',
                       cursor: 'pointer',
                       transition: 'all 0.2s ease',
@@ -1020,15 +1032,15 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               style={{
-                marginTop: 32,
-                padding: '16px 20px',
+                marginTop: 'clamp(16px, 4vw, 32px)',
+                padding: 'clamp(12px, 3vw, 16px) clamp(12px, 3vw, 20px)',
                 background: 'rgba(239,68,68,0.08)',
                 border: '1px solid rgba(239,68,68,0.2)',
                 borderRadius: 10,
                 textAlign: 'center',
               }}
             >
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--red)', letterSpacing: '0.04em', marginBottom: 12 }}>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'clamp(9px, 2vw, 11px)', color: 'var(--red)', letterSpacing: '0.04em', marginBottom: 'clamp(8px, 2vw, 12px)' }}>
                 {apiError}
               </div>
             </motion.div>
