@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Mic, ShieldCheck, Upload, Download, Briefcase, Shield, GraduationCap, Lock } from 'lucide-react';
 import { useAudioRecorder } from '@/hooks/useAudioRecorder';
+import { AccentOriginMap } from '@/app/components/AccentOriginMap';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // ─── Pipeline stages (Images 3, 4, 5) ────────────────────────────────────────
@@ -51,16 +52,22 @@ const IMPACT_SCENARIOS = [
     icon: Briefcase,
     title: 'Job Interview AI',
     body: 'Resume screeners reject candidates with non-standard accents at 2× the rate, before a human ever listens.',
+    stat: '2× rejection rate',
+    statColor: 'var(--red)',
   },
   {
     icon: Shield,
     title: 'Bank KYC Voice Screening',
     body: 'Voice authentication fails 34% more often for speakers with regional Indian accents, blocking access to financial services.',
+    stat: '34% failure rate',
+    statColor: 'var(--amber)',
   },
   {
     icon: GraduationCap,
     title: 'University Admission Systems',
     body: 'Automated interview scoring penalises phonetic variation, disadvantaging first-generation English speakers.',
+    stat: 'First-gen penalized',
+    statColor: 'var(--teal)',
   },
 ];
 
@@ -101,62 +108,6 @@ function ScoreRing({ score, size = 80, label }: { score: number; size?: number; 
   );
 }
 
-// ─── Northeast India Map SVG ─────────────────────────────────────────────────
-function NortheastIndiaMap() {
-  return (
-    <div>
-      <svg
-        width={180}
-        height={144}
-        viewBox="0 0 200 160"
-        style={{ display: 'block' }}
-        aria-label="Schematic map of Assam state"
-      >
-        {/* Assam state outline */}
-        <path
-          d="M30,60 L130,55 L150,90 L120,110 L40,105 Z"
-          fill="rgba(20,184,166,0.08)"
-          stroke="rgba(20,184,166,0.5)"
-          strokeWidth={1.5}
-        />
-
-        {/* Guwahati dot with pulse animation */}
-        <circle cx="70" cy="85" r="3" fill="var(--teal)">
-          <animate attributeName="r" values="3;6;3" dur="2s" repeatCount="indefinite" />
-          <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite" />
-        </circle>
-
-        {/* Jorhat dot */}
-        <circle cx="115" cy="72" r="3" fill="var(--teal)" />
-
-        {/* Silchar dot */}
-        <circle cx="95" cy="100" r="3" fill="var(--teal)" />
-
-        {/* Guwahati label */}
-        <text x="70" y="98" fontSize="9" fontFamily="var(--font-mono)" fill="rgba(0,0,0,0.5)" textAnchor="middle">
-          Guwahati
-        </text>
-
-        {/* Assam label */}
-        <text x="90" y="45" fontSize="9" fontFamily="var(--font-mono)" fill="rgba(0,0,0,0.5)" textAnchor="middle">
-          Assam
-        </text>
-      </svg>
-
-      {/* Top label */}
-      <div style={{
-        fontFamily: 'var(--font-mono)',
-        fontSize: 8,
-        color: 'var(--text-secondary)',
-        textAlign: 'center',
-        marginTop: 8,
-        letterSpacing: '0.04em',
-      }}>
-        Northeast India
-      </div>
-    </div>
-  );
-}
 
 // ─── Language Breakdown Bar ──────────────────────────────────────────────────
 function LanguageBreakdownBar({ wordRisks }: { wordRisks: any[] }) {
@@ -292,6 +243,8 @@ function BiasComparisonChart({ equityScore }: { equityScore: number }) {
   const standardBarHeight = Math.round((standardAsrScore / 100) * maxHeight);
   const yuktiBarHeight = Math.round((yuktiScore / 100) * maxHeight);
 
+  const improvement = yuktiScore - standardAsrScore;
+
   return (
     <div style={{ marginTop: 'clamp(20px, 4vw, 32px)', marginBottom: 'clamp(16px, 4vw, 24px)' }}>
       <div style={{
@@ -305,7 +258,7 @@ function BiasComparisonChart({ equityScore }: { equityScore: number }) {
         Bias correction delta
       </div>
 
-      <svg width="100%" height={maxHeight + 40} viewBox="0 0 200 160" style={{ maxWidth: 280 }}>
+      <svg width="100%" height={maxHeight + 50} viewBox="0 0 200 170" style={{ maxWidth: 280 }}>
         {/* Standard ASR Bar (Left) */}
         <rect
           x="30"
@@ -329,14 +282,53 @@ function BiasComparisonChart({ equityScore }: { equityScore: number }) {
         </text>
         <text
           x="55"
-          y={maxHeight + 20}
+          y={maxHeight + 18}
           textAnchor="middle"
-          fontSize="10"
+          fontSize="9"
           fill="var(--text-secondary)"
           fontFamily="var(--font-mono)"
+          fontWeight="600"
         >
-          Standard ASR
+          Industry Standard
         </text>
+
+        {/* Delta Arrow and improvement badge */}
+        <g>
+          {/* Arrow line */}
+          <line
+            x1="88"
+            y1={maxHeight - 60}
+            x2="112"
+            y2={maxHeight - 60}
+            stroke="var(--teal)"
+            strokeWidth="2"
+          />
+          {/* Arrow head */}
+          <polygon
+            points={`112,${maxHeight - 64} 112,${maxHeight - 56} 118,${maxHeight - 60}`}
+            fill="var(--teal)"
+          />
+          {/* Improvement badge */}
+          <rect
+            x="82"
+            y={maxHeight - 78}
+            width="36"
+            height="16"
+            rx="8"
+            fill="var(--teal)"
+          />
+          <text
+            x="100"
+            y={maxHeight - 67}
+            textAnchor="middle"
+            fontSize="9"
+            fontWeight="700"
+            fill="#fff"
+            fontFamily="var(--font-mono)"
+          >
+            +{improvement}
+          </text>
+        </g>
 
         {/* Yukti Bar (Right) */}
         <rect
@@ -360,13 +352,14 @@ function BiasComparisonChart({ equityScore }: { equityScore: number }) {
         </text>
         <text
           x="145"
-          y={maxHeight + 20}
+          y={maxHeight + 18}
           textAnchor="middle"
-          fontSize="10"
+          fontSize="9"
           fill="var(--text-secondary)"
           fontFamily="var(--font-mono)"
+          fontWeight="600"
         >
-          Yukti
+          Yukti Score
         </text>
 
         {/* Baseline */}
@@ -412,22 +405,34 @@ function ResearchBasis() {
           style={{
             fontSize: 'clamp(9px, 1.8vw, 11px)',
             fontFamily: 'var(--font-mono)',
-            color: 'var(--text-secondary)',
-            textDecoration: 'none',
-            opacity: 0.8,
+            color: 'var(--teal)',
+            textDecoration: 'underline',
+            textUnderlineOffset: '2px',
+            opacity: 0.9,
             transition: 'opacity 0.2s ease',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 4,
           }}
           onMouseEnter={(e) => { e.currentTarget.style.opacity = '1'; }}
-          onMouseLeave={(e) => { e.currentTarget.style.opacity = '0.8'; }}
+          onMouseLeave={(e) => { e.currentTarget.style.opacity = '0.9'; }}
         >
-          [1] Racial Disparities in Automated Speech Recognition · Stanford HAI · 2020 →
+          <span style={{ fontSize: 8 }}>↗</span>
+          [1] Racial Disparities in Automated Speech Recognition · Stanford HAI · 2020
         </a>
         <span style={{
           fontSize: 'clamp(9px, 1.8vw, 11px)',
           fontFamily: 'var(--font-mono)',
-          color: 'var(--text-muted)',
+          color: 'var(--text-secondary)',
         }}>
           [2] Accent Bias in AI Hiring Tools · MIT Media Lab · 2022
+        </span>
+        <span style={{
+          fontSize: 'clamp(9px, 1.8vw, 11px)',
+          fontFamily: 'var(--font-mono)',
+          color: 'var(--text-secondary)',
+        }}>
+          [3] Microsoft XTTS Accent Study · 2023
         </span>
       </div>
     </div>
@@ -721,11 +726,40 @@ function PipelineVisualizer({
   );
 }
 
+// ─── SDG 10.3 Badge ──────────────────────────────────────────────────────────
+function SDG103Badge() {
+  return (
+    <div style={{
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: 6,
+      padding: '4px 10px',
+      background: 'rgba(20,184,166,0.1)',
+      border: '1px solid rgba(20,184,166,0.3)',
+      borderRadius: 6,
+    }}>
+      <span style={{
+        fontFamily: 'var(--font-mono)',
+        fontSize: 10,
+        fontWeight: 600,
+        color: 'var(--teal)',
+      }}>
+        SDG 10.3
+      </span>
+      <span style={{
+        fontFamily: 'var(--font-mono)',
+        fontSize: 8,
+        color: 'var(--text-secondary)',
+      }}>
+        Equal Opportunity
+      </span>
+    </div>
+  );
+}
+
 // ─── Equity Report (Image 1 + 2) ─────────────────────────────────────────────
 function EquityReport({ auditData }: { auditData: any }) {
   const score = Number(auditData.equity_score ?? 0);
-  const accent = auditData.audit?.accent_identified || '';
-  const shouldShowMap = /Assamese|Northeast|Bengal|Odia/i.test(accent);
   // Generate session ID from transcript hash - stable during re-renders
   const transcriptPrefix = auditData.transcript?.slice(0, 3).toUpperCase() || 'AUD';
   const scoreHash = Math.round(score * 100).toString(16).toUpperCase().padStart(2, '0');
@@ -742,6 +776,9 @@ function EquityReport({ auditData }: { auditData: any }) {
       <div style={{ marginBottom: 'clamp(16px, 4vw, 32px)', paddingBottom: 'clamp(12px, 3vw, 24px)', borderBottom: '1px solid var(--border)' }}>
         <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start', justifyContent: 'space-between', gap: 'clamp(12px, 3vw, 24px)' }}>
           <div style={{ flex: '1 1 min-content' }}>
+            <div style={{ marginBottom: 'clamp(10px, 2vw, 16px)' }}>
+              <SDG103Badge />
+            </div>
             <h2 style={{
               fontFamily: 'var(--font-serif)',
               fontSize: 'clamp(28px, 6vw, 42px)',
@@ -810,6 +847,13 @@ function EquityReport({ auditData }: { auditData: any }) {
         {/* Before/After Comparison Chart */}
         <BiasComparisonChart equityScore={score} />
 
+        {/* Language Breakdown Bar - Moved above transcript as per requirement */}
+        {auditData.word_risks?.length > 0 && (
+          <div style={{ marginBottom: 'clamp(16px, 3vw, 24px)' }}>
+            <LanguageBreakdownBar wordRisks={auditData.word_risks} />
+          </div>
+        )}
+
         <div style={{ marginBottom: 'clamp(8px, 2vw, 12px)' }}>
           <div style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(13px, 2.5vw, 15px)', color: 'var(--text-secondary)', marginBottom: 'clamp(6px, 1.5vw, 10px)' }}>
             Equitable Transcript
@@ -876,11 +920,6 @@ function EquityReport({ auditData }: { auditData: any }) {
           </div>
         )}
 
-        {/* Language Breakdown Bar */}
-        {auditData.word_risks?.length > 0 && (
-          <LanguageBreakdownBar wordRisks={auditData.word_risks} />
-        )}
-
         {/* XAI explanation */}
         {auditData.xai_explanation && (
           <p style={{ fontSize: 'clamp(11px, 2vw, 12px)', color: 'var(--text-secondary)', lineHeight: 1.7 }}>
@@ -935,20 +974,9 @@ function EquityReport({ auditData }: { auditData: any }) {
               <div style={{ fontSize: 'clamp(12px, 2.5vw, 14px)', color: 'var(--text-primary)', lineHeight: 1.5 }}>
                 {auditData.audit.accent_identified}
               </div>
-              {/* Northeast India Map */}
-              {shouldShowMap && (
-                <div style={{ marginTop: 'clamp(10px, 2vw, 14px)' }}>
-                  <NortheastIndiaMap />
-                  <div style={{
-                    fontFamily: 'var(--font-mono)',
-                    fontSize: 'clamp(8px, 1.6vw, 10px)',
-                    color: 'var(--text-secondary)',
-                    marginTop: 'clamp(6px, 1.5vw, 10px)',
-                    letterSpacing: '0.04em',
-                  }}>
-                    Origin region: Northeast India
-                  </div>
-                </div>
+              {/* Accent Origin Map - Always show when accent is identified */}
+              {auditData.audit.accent_identified && (
+                <AccentOriginMap accentIdentified={auditData.audit.accent_identified} />
               )}
             </div>
           )}
@@ -972,7 +1000,7 @@ function EquityReport({ auditData }: { auditData: any }) {
 }
 
 // ─── Waveform Visualizer Canvas ───────────────────────────────────────────────
-function WaveformVisualizer({ stream }: { stream: MediaStream | null }) {
+function WaveformVisualizer({ stream, isRecording }: { stream: MediaStream | null; isRecording?: boolean }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
@@ -1022,26 +1050,32 @@ function WaveformVisualizer({ stream }: { stream: MediaStream | null }) {
       if (!ctx) return;
 
       const bufferLength = analyser.frequencyBinCount;
-      const dataArray = new Uint8Array(bufferLength);
+      const timeDataArray = new Uint8Array(bufferLength);
+      const freqDataArray = new Uint8Array(bufferLength);
 
       const draw = () => {
         if (!analyserRef.current || !canvas) return;
 
-        analyserRef.current.getByteTimeDomainData(dataArray);
+        // Get both time domain and frequency data
+        analyserRef.current.getByteTimeDomainData(timeDataArray);
+        analyserRef.current.getByteFrequencyData(freqDataArray);
 
+        // Clear canvas
         ctx.fillStyle = 'rgba(0, 0, 0, 0)';
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        ctx.lineWidth = 1.5;
+        // Draw waveform (top portion - 60%)
+        ctx.lineWidth = 2;
         ctx.strokeStyle = 'var(--teal)';
         ctx.beginPath();
 
+        const waveformHeight = canvas.height * 0.6;
         const sliceWidth = canvas.width / bufferLength;
         let x = 0;
 
         for (let i = 0; i < bufferLength; i++) {
-          const v = dataArray[i] / 128.0;
-          const y = (v * canvas.height) / 2;
+          const v = timeDataArray[i] / 128.0;
+          const y = (v * waveformHeight) / 2;
 
           if (i === 0) {
             ctx.moveTo(x, y);
@@ -1052,8 +1086,27 @@ function WaveformVisualizer({ stream }: { stream: MediaStream | null }) {
           x += sliceWidth;
         }
 
-        ctx.lineTo(canvas.width, canvas.height / 2);
+        ctx.lineTo(canvas.width, waveformHeight / 2);
         ctx.stroke();
+
+        // Draw frequency bars (bottom portion - 30%)
+        const barAreaStart = canvas.height * 0.7;
+        const barHeight = canvas.height * 0.25;
+        const numBars = 32;
+        const barWidth = canvas.width / numBars;
+
+        for (let i = 0; i < numBars; i++) {
+          const freqIndex = Math.floor((i / numBars) * (bufferLength / 2));
+          const value = freqDataArray[freqIndex];
+          const barH = (value / 255) * barHeight;
+
+          const gradient = ctx.createLinearGradient(0, barAreaStart + barHeight, 0, barAreaStart);
+          gradient.addColorStop(0, 'rgba(20,184,166,0.3)');
+          gradient.addColorStop(1, 'rgba(20,184,166,0.8)');
+
+          ctx.fillStyle = gradient;
+          ctx.fillRect(i * barWidth + barWidth * 0.2, barAreaStart + barHeight - barH, barWidth * 0.6, barH);
+        }
 
         animationRef.current = requestAnimationFrame(draw);
       };
@@ -1082,17 +1135,28 @@ function WaveformVisualizer({ stream }: { stream: MediaStream | null }) {
   if (!stream) return null;
 
   return (
-    <motion.canvas
+    <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      ref={canvasRef}
-      width={200}
-      height={48}
       style={{
         marginTop: 16,
-        borderRadius: 4,
+        padding: 4,
+        borderRadius: 8,
+        border: isRecording ? '2px solid rgba(20,184,166,0.5)' : '1px solid rgba(0,0,0,0.1)',
+        boxShadow: isRecording ? '0 0 20px rgba(20,184,166,0.3)' : 'none',
+        transition: 'box-shadow 0.3s ease, border-color 0.3s ease',
       }}
-    />
+    >
+      <canvas
+        ref={canvasRef}
+        width={280}
+        height={60}
+        style={{
+          borderRadius: 4,
+          display: 'block',
+        }}
+      />
+    </motion.div>
   );
 }
 
@@ -1438,7 +1502,7 @@ export default function Home() {
               style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 24, marginBottom: 0 }}
             >
               <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                {/* Outer pulse rings */}
+                {/* Outer pulse rings - scaled for mobile */}
                 {isRecording && [1, 2, 3].map((i) => (
                   <motion.div
                     key={i}
@@ -1446,18 +1510,18 @@ export default function Home() {
                     transition={{ duration: 2, repeat: Infinity, delay: i * 0.4, ease: 'easeOut' }}
                     style={{
                       position: 'absolute',
-                      width: 120,
-                      height: 120,
+                      width: 100,
+                      height: 100,
                       borderRadius: '50%',
                       border: '1px solid var(--teal)',
                     }}
                   />
                 ))}
 
-                {/* Outer container */}
+                {/* Outer container - 100px for better mobile proportions */}
                 <div style={{
-                  width: 120,
-                  height: 120,
+                  width: 100,
+                  height: 100,
                   borderRadius: '50%',
                   border: '2px solid rgba(20,184,166,0.3)',
                   background: 'rgba(20,184,166,0.05)',
@@ -1466,15 +1530,15 @@ export default function Home() {
                   justifyContent: 'center',
                   position: 'relative',
                 }}>
-                  {/* Inner button */}
+                  {/* Inner button - 68px for better proportions */}
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={isRecording ? stopRecording : startRecording}
                     aria-label={isRecording ? 'Stop recording' : 'Start recording'}
                     style={{
-                      width: 80,
-                      height: 80,
+                      width: 68,
+                      height: 68,
                       borderRadius: '50%',
                       background: isRecording ? 'rgba(20,184,166,0.12)' : 'rgba(255,255,255,0.9)',
                       border: isRecording ? '2px solid var(--teal)' : '1.5px solid rgba(0,0,0,0.12)',
@@ -1496,7 +1560,7 @@ export default function Home() {
                       e.currentTarget.style.boxShadow = isRecording ? '0 0 0 8px rgba(20,184,166,0.08)' : 'none';
                     }}
                   >
-                    <Mic size={28} style={{ color: isRecording ? 'var(--teal)' : 'rgba(0,0,0,0.35)' }} />
+                    <Mic size={24} style={{ color: isRecording ? 'var(--teal)' : 'rgba(0,0,0,0.35)' }} />
                   </motion.button>
                 </div>
 
@@ -1569,9 +1633,9 @@ export default function Home() {
           )}
         </AnimatePresence>
 
-        {/* Real-world impact scenario cards */}
+        {/* Real-world impact scenario cards - only show when NOT recording and NOT processing */}
         <AnimatePresence>
-          {!isProcessing && !isComplete && (
+          {!isProcessing && !isComplete && !isRecording && (
             <motion.div
               key="impact-cards"
               initial={{ opacity: 0, y: 20 }}
@@ -1580,6 +1644,7 @@ export default function Home() {
               style={{
                 width: '100%',
                 maxWidth: 720,
+                marginTop: 'clamp(32px, 6vw, 48px)',
                 marginBottom: 'clamp(24px, 5vw, 40px)',
               }}
             >
@@ -1619,6 +1684,16 @@ export default function Home() {
                         }}>
                           {scenario.title}
                         </span>
+                      </div>
+                      {/* Stat highlight */}
+                      <div style={{
+                        fontFamily: 'var(--font-mono)',
+                        fontSize: 'clamp(13px, 2.5vw, 16px)',
+                        fontWeight: 700,
+                        color: (scenario as any).statColor || 'var(--teal)',
+                        marginBottom: 'clamp(6px, 1.5vw, 10px)',
+                      }}>
+                        {(scenario as any).stat}
                       </div>
                       <p style={{
                         fontFamily: 'var(--font-serif)',

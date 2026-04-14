@@ -1,4 +1,6 @@
 // NO-LOG: audio data is processed in-memory only and never persisted
+// Privacy: All audio data is deleted immediately after processing completes
+// Security: No persistent storage of user audio - all processing happens in-memory
 
 import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
@@ -210,9 +212,14 @@ Return nothing else. No markdown, no explanation.`;
       'Content-Type': 'application/x-ndjson; charset=utf-8',
       'Cache-Control': 'no-cache, no-transform',
       Connection: 'keep-alive',
+      // Security/Privacy headers
       'X-Audio-Retention': 'none',
       'X-Data-Processing': 'in-memory-only',
+      'X-Content-Type-Options': 'nosniff',
+      'X-Frame-Options': 'DENY',
       'X-Transcription-Source': transcriptionSource,
+      // Explicit privacy notice header
+      'X-Privacy-Policy': 'Audio deleted after processing - no logs retained',
     },
   });
 }
